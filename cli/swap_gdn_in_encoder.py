@@ -36,7 +36,7 @@ def main():
             raise ValueError("arch が不明です（--arch を指定するか ckpt に arch を含めてください）")
         quality = payload.get("meta", {}).get("quality", args.quality)
         model = build_zoo_model(arch=arch, quality=quality, pretrained=False).to(device).eval()
-        if args.check and args.approx == "einsum":
+        if args.check and args.approx in ["einsum", "matmul"]:
             model_before = copy.deepcopy(model)
     else:
         if not args.arch:
@@ -44,7 +44,7 @@ def main():
         arch = args.arch
         model = build_zoo_model(arch=arch, quality=args.quality, pretrained=args.pretrained).to(device).eval()
         quality = args.quality
-        if args.check and args.approx == "einsum":
+        if args.check and args.approx in ["einsum", "matmul"]:
             model_before = copy.deepcopy(model)
 
     # 置換を適用
