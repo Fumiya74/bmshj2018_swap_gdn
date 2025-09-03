@@ -20,7 +20,7 @@ def main():
     ap.add_argument("--out", type=str, required=True, help="保存先 .pth")
 
     ap.add_argument("--approx", type=str, default="einsum",
-                    choices=("einsum", "diag", "lowrank"))
+                    choices=("einsum", "matmul", "diag", "lowrank"))
     ap.add_argument("--rank", type=int, default=16, help="lowrank のランク")
     ap.add_argument("--device", type=str, default="cpu")
     ap.add_argument("--check", action="store_true", help="置換前後の簡易数値確認（einsum等価置換の確認に有効）")
@@ -62,7 +62,7 @@ def main():
             print(f"[warn] missing={missing.missing_keys[:6]}..., unexpected={missing.unexpected_keys[:6]}...")
 
     # ★ 等価置換の簡易チェックは EncoderWrapper 経由（潜在 y を比較）
-    if args.check and args.approx == "einsum":
+    if args.check and args.approx in ["einsum", "matmul"]:
         before = EncoderWrapper(model_before).to(device).eval()
         after  = EncoderWrapper(model).to(device).eval()
         _ = quick_sanity_check(before, after, device=device)
