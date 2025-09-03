@@ -114,6 +114,25 @@ python -m cli.export_onnx   --ckpt swapped_bmshj2018_q8_einsum.pth   --out full.
 
 ---
 
+# Update: `approx=matmul` が選べるようになりました
+
+- 置換方式 `--approx` の選択肢に **`matmul`** を追加しました（`einsum` と数値的に等価／ほぼ等価）。
+- `gdn_variants.py` に `class MatmulGDN` を追加しました（`torch.matmul` を用いた実装）。
+- `replacer.py` の `make_replacement` / `replace_gdn_in_encoder` が `matmul` を受け付けます。
+- `cli/swap_gdn_in_encoder.py` の `--approx` choices に `matmul` を追加しました。
+
+最短実行例（Encoder 内 GDN を置換 → .pth 保存）:
+
+```bash
+python -m cli.swap_gdn_in_encoder \
+  --arch bmshj2018_factorized --quality 8 --pretrained \  --approx matmul --out swapped_bmshj2018_q8_matmul.pth --check
+```
+
+> 注: `matmul` は `einsum` と同様に 1×1 Conv を等価に置換する実装です。各ランタイム/エクスポート環境で
+> `einsum` より `matmul` が好まれる場合に選択してください。
+
+---
+
 ## ワークフロー例（最短）
 
 1. 置換して保存：
